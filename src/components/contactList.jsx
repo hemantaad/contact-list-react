@@ -1,25 +1,39 @@
 import React, { Component } from "react";
 import { getContacts } from "../services/contactCard";
 import ContactCard from "./contactCard";
-
+import Pagination from "./common/pagination";
+import { paginate } from "../utils/paginate";
 class ContactList extends Component {
   state = {
-    contacts: getContacts(),
+    contacts: [],
+    currentPage: 1,
+    pageSize: 4,
   };
 
-  // componentDidMount() {
-  //   console.log("Component mounted.");
-  //   this.setState({ contacts: getContacts() });
-  // }
+  componentDidMount() {
+    console.log("Component mounted.");
+    this.setState({ contacts: getContacts() });
+  }
+
+  handlePageChange = (pageNumber) => {
+    this.setState({ currentPage: pageNumber });
+  };
 
   render() {
-    const contacts = [...this.state.contacts];
-    console.log(contacts, "contacts array");
+    const { contacts, currentPage, pageSize } = this.state;
+    const paginatedContacts = paginate(contacts, currentPage, pageSize);
+
     return (
       <div className="container">
-        {contacts.map((contact) => (
-          <ContactCard contact={contact} />
+        {paginatedContacts.map((contact) => (
+          <ContactCard contact={contact} key={contact.id} />
         ))}
+        <Pagination
+          itemCount={contacts.length}
+          pageSize={pageSize}
+          currentPage={currentPage}
+          onPageChange={this.handlePageChange}
+        />
       </div>
     );
   }
